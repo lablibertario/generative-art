@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Übungszettel 2</title>
+
+  <style>
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    canvas {
+      background-color: #000;
+      display: block;
+    }
+
+    /* dat gui */
+    .dg .cr.string,
+    .dg .cr.number {
+      border-left: 3px solid #fff !important;
+    }
+
+    .dg .c .slider-fg {
+      background: #fff !important;
+    }
+
+    .dg .cr.number input[type=text] {
+      color: #fff !important;
+    }
+  </style>
+</head>
+<body>
+  <canvas></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.2.0/simplex-noise.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.1/dat.gui.min.js"></script>
+
+  <script src="helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
