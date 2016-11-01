@@ -25,6 +25,8 @@ function App(config) {
   this.resolutionWidth = 50;
   this.resolutionHeight = 50;
 
+  this.singleSize = 1;
+
   this.time = 0;
   this.tempo = 1;
   this.transitionTempo = 1;
@@ -32,6 +34,8 @@ function App(config) {
 
   this.clearOpacity = 0.9;
   this.lineWidth = 1;
+  this.color = false;
+  this.colorInverse = false;
 
   this.patterns = [];
   this.currentPattern = 0;
@@ -124,7 +128,11 @@ App.prototype.stop = function() {
 App.prototype.clear = function() {
   var context = this.canvas.getContext('2d');
 
-  context.fillStyle = 'rgba(0, 0, 0, ' + this.clearOpacity + ')';
+  if (this.colorInverse) {
+    context.fillStyle = 'rgba(255, 255, 255, ' + this.clearOpacity + ')';
+  } else {
+    context.fillStyle = 'rgba(0, 0, 0, ' + this.clearOpacity + ')';
+  }
 
   context.fillRect(0, 0, this.width, this.height);
 }
@@ -181,9 +189,31 @@ App.prototype.update = function() {
         2000 + j / 500 + this.time / 500
       ) + 1) / 2;
 
-      context.fillStyle = context.strokeStyle = 'rgba(255, 255, 255, ' + brightness + ')';
+      var size = (this.noise.noise2D(
+        1000 + i / 500 + this.time / 500,
+        2000 + j / 500 + this.time / 500
+      ) + 2) / 2 * this.singleSize;
 
-      this.patterns[pattern].drawSingle(i, j);
+      var hue = (this.noise.noise2D(
+        1000 + i / 500 + this.time / 500,
+        2000 + j / 500 + this.time / 500
+      ) + 1) / 2 * 360;
+
+      if (this.color) {
+        if (this.colorInverse) {
+          context.fillStyle = context.strokeStyle = 'hsla(' + (hue + 180) + ', 100%, 50%, ' + brightness + ')';
+        } else {
+          context.fillStyle = context.strokeStyle = 'hsla(' + hue + ', 100%, 50%, ' + brightness + ')';
+        }
+      } else {
+        if (this.colorInverse) {
+          context.fillStyle = context.strokeStyle = 'rgba(0, 0, 0, ' + brightness + ')';
+        } else {
+          context.fillStyle = context.strokeStyle = 'rgba(255, 255, 255, ' + brightness + ')';
+        }
+      }
+
+      this.patterns[pattern].drawSingle(i, j, size);
     }
   }
 }

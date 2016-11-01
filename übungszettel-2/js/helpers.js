@@ -1,14 +1,12 @@
-function lerp(a, b, t) {
-  return a * (1 - t) + b * t;
-}
+var helpers = {
 
-function clamp(value, min, max) {
-  if (value < min) {
-    return min;
-  }
-  else if (value > max) {
-    return max;
+  distance: function(x1, y1, x2, y2) {
+    var a = x1 - x2
+    var b = y1 - y2
+
+    var c = Math.sqrt(a * a + b * b);
+
+    return c;
   }
 
-  return value;
 }

@@ -54,8 +54,11 @@
         [ 'transitionTempo', 0.1, 10 ],
         [ 'resolutionWidth', 10, 200 ],
         [ 'resolutionHeight', 10, 200 ],
+        [ 'singleSize', 1, 20 ],
         [ 'lineWidth', 1, 10 ],
-        [ 'clearOpacity', 0.1, 1 ]
+        [ 'clearOpacity', 0.1, 1 ],
+        [ 'color' ],
+        [ 'colorInverse' ]
       ],
       patterns: [
         Vectors,
@@ -63,7 +66,9 @@
         Circles
       ],
       transitions: [
-        SimpleTransition
+        SimpleTransition,
+        NoiseTransition,
+        RadialTransition
       ]
     });
 
