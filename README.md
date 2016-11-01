@@ -4,7 +4,7 @@ Example projects showcasing different features of bpmn-questionnaire
 
 ## Übungszettel
 
-* [Übungszettel 2](https://github.com/philippfromme/generative-gestaltung/tree/master/übungszettel-2)
+* [Übungszettel 2](https://github.com/philippfromme/generative-gestaltung-ws-2016/tree/master/%C3%BCbungszettel-2)
 
 ## License
 
