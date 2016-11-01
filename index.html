@@ -40,6 +40,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.1/dat.gui.min.js"></script>
 
   <script src="helpers.js"></script>
+  <script src="patterns.js"></script>
+  <script src="transitions.js"></script>
   <script src="app.js"></script>
+
+  <script>
+    var app = new App({
+      canvas: document.querySelector('canvas'),
+      variables: [
+        [ 'isRunning' ],
+        [ 'tempo', 0.1, 10 ],
+        [ 'transitionTempo', 0.1, 10 ],
+        [ 'resolutionWidth', 10, 200 ],
+        [ 'resolutionHeight', 10, 200 ],
+        [ 'lineWidth', 1, 10 ],
+        [ 'clearOpacity', 0.1, 1 ]
+      ],
+      patterns: [
+        Vectors,
+        Rectangles,
+        Circles
+      ],
+      transitions: [
+        SimpleTransition
+      ]
+    });
+
+    // kick off app
+    app.run();
+  </script>
 </body>
 </html>
