@@ -47,7 +47,7 @@ function App(config) {
   });
 
   this.transitions = [];
-  this.currentTransition = 0;
+  this.currentTransition = undefined;
 
   if (!config.transitions && config.patterns.length > 1) {
     throw new Error('no transitions found');
@@ -147,11 +147,34 @@ App.prototype.update = function() {
 
     for(var j = 0; j < this.height; j += this.height / this.resolutionHeight) {
 
-      // TODO implement changing transitions
-      var pattern = Math.floor((this.noise.noise2D(
-        i / 500 + this.time / 500 * this.transitionTempo,
-        j / 500 + this.time / 500 * this.transitionTempo
-      ) + 1) / 2 * this.patterns.length);
+      if (!this.currentTransition) {
+        var index = Math.floor(Math.random() * this.transitions.length);
+
+        this.currentTransition = new this.transitions[index](this.time);
+      }
+
+      var nextPattern = this.currentPattern + 1 === this.patterns.length ? 0 : this.currentPattern + 1;
+
+      var endTime = this.currentTransition.startTime + 200 / this.transitionTempo;
+
+      var pattern = this.currentTransition.transition(
+        this.currentPattern,
+        nextPattern,
+        i,
+        j,
+        this.width,
+        this.height,
+        this.time,
+        endTime
+      );
+
+      var isFinished = this.currentTransition.isFinished(this.time, endTime);
+
+      if (isFinished) {
+        this.currentTransition = undefined;
+
+        this.currentPattern = nextPattern;
+      }
 
       var brightness = (this.noise.noise2D(
         1000 + i / 500 + this.time / 500,
