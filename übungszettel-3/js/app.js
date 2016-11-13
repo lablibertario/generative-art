@@ -26,9 +26,11 @@ function App(config) {
   this.tempo = 1;
   this.isRunning = false;
 
-  this.autoInvertColors = true;
+  this.autoInvertColors = false;
   this.autoChangeAnimations = false;
-  this.autoMoveCenter = true;
+  this.animationChangeInterval = 200;
+  this.tweening = 'ease';
+  this.autoMoveCenter = false;
   this.depthEnabled = true;
   this.depthCount = 10;
   this.fillPolygons = false;
@@ -41,11 +43,25 @@ function App(config) {
 
   this.noise = new SimplexNoise();
 
-  this.polygon = new Polygon([
-    new Point(this.width / 2, 100),
-    new Point(100, this.height - 100),
-    new Point(this.width - 100, this.height - 100)
-  ]);
+  this.polygon = new Polygon([]);
+
+  this.animations = [];
+
+  if (!config.animations) {
+    throw new Error('no animations found');
+  }
+
+  this.animations = config.animations;
+
+  this.currentAnimationStartTime = 0;
+  this.currentAnimation = this.animations[0];
+
+  this.centerAnimationTime = 50;
+  this.centerAnimationStartTime = 0;
+  this.centerAnimation = new Animation([{
+    time: 0,
+    data: [ new Point(this.width / 2, this.height / 2) ]
+  }]);
 
   this.datGui = undefined;
 
@@ -62,11 +78,37 @@ function App(config) {
     }
 
     if (e.key === 'a') {
-
-      // change animation
-
+      that.changeAnimation();
     }
   });
+
+  this.canvas.addEventListener('mousedown', function(e) {
+    var x = event.clientX;
+    var y = event.clientY;
+
+    if (!this.autoMoveCenter) {
+      that.centerAnimation = new Animation([
+        {
+          time: 0,
+          data: [ new Point(that.center.x, that.center.y) ]
+        },
+        {
+          time: that.centerAnimationTime,
+          data: [ new Point(x, y) ]
+        }
+      ]);
+
+      that.centerAnimationStartTime = that.time;
+    }
+  });
+}
+
+App.prototype.changeAnimation = function() {
+  var animation = Math.floor(Math.random() * this.animations.length);
+
+  this.currentAnimationStartTime = this.time;
+
+  this.currentAnimation = this.animations[animation];
 }
 
 App.prototype.updateGui = function(variables) {
@@ -86,6 +128,9 @@ App.prototype.updateGui = function(variables) {
           break;
         case 'number':
           controller = that.datGui.add(that, variable.variable, variable.min, variable.max).listen();
+          break;
+        case 'dropdown':
+          controller = that.datGui.add(that, variable.variable, variable.options).listen();
           break;
       }
 
@@ -165,9 +210,19 @@ App.prototype.update = function() {
     var offsetY = this.noise.noise2D(1000 + this.time / 500, 0) * 250;
 
     this.center = new Point(this.initialCenter.x + offsetX, this.initialCenter.y + offsetY);
+  } else {
+    this.center = this.centerAnimation.getData(
+      this.time - this.centerAnimationStartTime, this.tweening)[0];
   }
 
   var offsetScale = this.noise.noise2D(1000 + this.time / 500, 0) + 1;
+
+  if (this.time % this.animationChangeInterval === 0 && this.autoChangeAnimations) {
+    this.changeAnimation();
+  }
+
+  this.polygon.points = this.currentAnimation.getData(
+    this.time - this.currentAnimationStartTime, this.tweening);
 
   if (this.depthEnabled) {
 
