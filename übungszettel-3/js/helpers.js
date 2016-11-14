@@ -72,24 +72,6 @@ var helpers = {
     } while (swapped);
 
     return clone;
-  },
-
-  createRandomPoints: function(width, height) {
-    var x1 = Math.random() * (width - 100) + 50;
-    var x2 = x1 + Math.random() * 500 + 50;
-    var y1 = Math.random() * 500 + 50;
-    var x3 = width - Math.random() * 500 - 50;
-    var x4 = x3 - Math.random() * (width - 500) - 50;
-    var y2 = height - Math.random() * 500 - 50;
-
-    points = [
-      new Point(x1, y1),
-      new Point(x2, y1),
-      new Point(x3, y2),
-      new Point(x4, y2)
-    ];
-
-    return points;
   }
 
 }

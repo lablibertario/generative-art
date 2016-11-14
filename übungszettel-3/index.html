@@ -52,22 +52,86 @@
   <script src="js/app.js"></script>
 
   <script>
-    function createRandomAnimation(width, height) {
-      var firstAndLast = helpers.createRandomPoints(width, height);
+    var noise = new SimplexNoise();
+
+    function createRandomFilledParallelogram(width, height) {
+
+      function createRandomParallelogramPoints(width, height) {
+        var x1 = Math.random() * (width - 100) + 50;
+        var x2 = x1 + Math.random() * 500 + 50;
+        var y1 = Math.random() * 500 + 50;
+        var x3 = width - Math.random() * 500 - 50;
+        var x4 = x3 - Math.random() * (width - 500) - 50;
+        var y2 = height - Math.random() * 500 - 50;
+
+        points = [
+          new Point(x1, y1),
+          new Point(x2, y1),
+          new Point(x3, y2),
+          new Point(x4, y2)
+        ];
+
+        return points;
+      }
+
+      var firstAndLast = createRandomParallelogramPoints(width, height);
 
       return new Animation([
         { time: 0, data: firstAndLast },
-        { time: 200, data: helpers.createRandomPoints(width, height) },
-        { time: 300, data: helpers.createRandomPoints(width, height) },
+        { time: 200, data: createRandomParallelogramPoints(width, height) },
+        { time: 350, data: createRandomParallelogramPoints(width, height) },
         { time: 400, data: firstAndLast }
-      ], true);
+      ], true, 'filled');
     }
+
+    function createRandomStrokedOval(width, height) {
+
+      function createRandomOvalPoints(width, height) {
+
+        var noiseOffset = Math.random() * 10000;
+
+        var radiusOffset = Math.random() * (width > height ? height / 3 : width / 3);
+
+        var radiusX = width > height ? height - radiusOffset : width - radiusOffset;
+        var radiusY = width > height ? height - radiusOffset : width - radiusOffset;
+        var center = { x: width / 2, y: height / 2 };
+
+        var points = [];
+
+        var n = Math.random() * 95 + 5;
+
+        for (var i = 0; i < Math.PI * 2; i += Math.PI * 2 / n) {
+          var x = radiusX * Math.cos(i) + center.x + noise.noise2D(i + noiseOffset, 0) * 200;
+          var y = radiusY * Math.sin(i) + center.y + noise.noise2D(0, i + noiseOffset) * 200;
+
+          points.push(new Point(x, y));
+        }
+
+        return points;
+      }
+
+      var firstAndLast = createRandomOvalPoints(width, height);
+
+      return new Animation([
+        { time: 0, data: firstAndLast },
+        { time: 200, data: createRandomOvalPoints(width, height) },
+        { time: 250, data: createRandomOvalPoints(width, height) },
+        { time: 400, data: firstAndLast }
+      ], true, 'stroked');
+    }
+
+    var createRandomFunctions = [
+      createRandomFilledParallelogram,
+      createRandomStrokedOval
+     ];
 
     function createRandomAnimations(count) {
       var animations = [];
 
       for (var i = 0; i < count; i++) {
-        animations.push(createRandomAnimation(1280, 720));
+        var index = Math.floor(Math.random() * createRandomFunctions.length)
+
+        animations.push(createRandomFunctions[index](1280, 720));
       }
 
       return animations;

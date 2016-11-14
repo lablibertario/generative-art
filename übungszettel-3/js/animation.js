@@ -1,8 +1,10 @@
-function Animation(keyframes, isLooping) {
+function Animation(keyframes, isLooping, type) {
   this.keyframes = keyframes || [];
   this.keyframes = helpers.bubbleSort(this.keyframes, 'time');
 
   this.isLooping = isLooping || false;
+
+  this.type = type || 'line'; // lines, points, stroked, filled
 }
 
 Animation.prototype.addKeyframe = function(keyframe) {

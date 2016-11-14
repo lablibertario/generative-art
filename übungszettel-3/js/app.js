@@ -33,7 +33,6 @@ function App(config) {
   this.autoMoveCenter = false;
   this.depthEnabled = true;
   this.depthCount = 10;
-  this.fillPolygons = false;
   this.zooming = true;
   this.clearOpacity = 0.9;
   this.invertColors = false;
@@ -201,10 +200,6 @@ App.prototype.update = function() {
     this.invertColors = !this.invertColors;
   }
 
-  if (Math.random() < 0.01 * this.tempo) {
-    this.fillPolygons = !this.fillPolygons;
-  }
-
   if (this.autoMoveCenter) {
     var offsetX = this.noise.noise2D(this.time / 500, 0) * 250;
     var offsetY = this.noise.noise2D(1000 + this.time / 500, 0) * 250;
@@ -232,32 +227,52 @@ App.prototype.update = function() {
 
       var polygon = new Polygon(points);
 
-      if (this.fillPolygons) {
+      if (this.currentAnimation.type === 'filled') {
         this.invertColors ? polygon.setColor('rgba(0, 0, 0, 0.1)')
           : polygon.setColor('rgba(255, 255, 255, 0.1)');
 
         polygon.drawFilled(context);
-      } else {
+      } else if (this.currentAnimation.type === 'stroked') {
         this.invertColors ? polygon.setColor('rgb(0, 0, 0)')
           : polygon.setColor('rgb(255, 255, 255)');
 
         polygon.drawStroked(context);
+      } else if (this.currentAnimation.type === 'lines') {
+        this.invertColors ? polygon.setColor('rgb(0, 0, 0)')
+          : polygon.setColor('rgb(255, 255, 255)');
+
+        polygon.drawLines(context);
+      } else {
+        this.invertColors ? this.polygon.setColor('rgb(0, 0, 0)')
+          : this.polygon.setColor('rgb(255, 255, 255)');
+
+        this.polygon.drawPoints(context);
       }
 
     }
 
   } else {
 
-    if (this.fillPolygons) {
+    if (this.currentAnimation.type === 'filled') {
       this.invertColors ? this.polygon.setColor('rgba(0, 0, 0, 0.1)')
         : this.polygon.setColor('rgba(255, 255, 255, 0.1)');
 
       this.polygon.drawFilled(context);
-    } else {
+    } else if (this.currentAnimation.type === 'stroked') {
       this.invertColors ? this.polygon.setColor('rgb(0, 0, 0)')
         : this.polygon.setColor('rgb(255, 255, 255)');
 
       this.polygon.drawStroked(context);
+    } else if (this.currentAnimation.type === 'lines') {
+      this.invertColors ? this.polygon.setColor('rgb(0, 0, 0)')
+        : this.polygon.setColor('rgb(255, 255, 255)');
+
+      this.polygon.drawLines(context);
+    } else {
+      this.invertColors ? this.polygon.setColor('rgb(0, 0, 0)')
+        : this.polygon.setColor('rgb(255, 255, 255)');
+
+      this.polygon.drawPoints(context);
     }
 
   }
