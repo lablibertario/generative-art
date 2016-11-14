@@ -120,9 +120,50 @@
       ], true, 'stroked');
     }
 
+    function createRandomPointsField(width, height) {
+
+      function createRandomPointsFieldPoints(width, height) {
+
+        var randomN = Math.random() * 10 + 40;
+
+        var nX = width / randomN;
+        var nY = height / randomN;
+
+        var stepX = width / nX;
+        var stepY = height / nY;
+
+        var offsetNoise = Math.random() * 10000;
+
+        var points = [];
+
+        for (var i = 0; i < nX; i++) {
+
+          for (var j = 0; j < nY; j++) {
+            var offsetX = noise.noise2D(i * j / 10 + offsetNoise, 0) * 10;
+            var offsetY = noise.noise2D(i * j / 10 + offsetNoise + 1000, 0) * 10;
+
+            points.push(new Point(i * stepX + offsetX, j * stepY + offsetY));
+          }
+        }
+
+        return points;
+
+      }
+
+      var firstAndLast = createRandomPointsFieldPoints(width, height);
+
+      return new Animation([
+        { time: 0, data: firstAndLast },
+        { time: 200, data: createRandomPointsFieldPoints(width, height) },
+        { time: 250, data: createRandomPointsFieldPoints(width, height) },
+        { time: 500, data: firstAndLast }
+      ], true, 'lines');
+    }
+
     var createRandomFunctions = [
       createRandomFilledParallelogram,
-      createRandomStrokedOval
+      createRandomStrokedOval,
+      createRandomPointsField
      ];
 
     function createRandomAnimations(count) {
