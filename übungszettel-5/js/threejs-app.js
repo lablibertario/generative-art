@@ -11,6 +11,8 @@ ThreeApp.prototype.init = function () {
 
   var that = this;
 
+  this.renderer.shadowMapEnabled = true;
+
   var pointLight = new THREE.PointLight(0xffffff, 1, 500);
   pointLight.position.set(100, 100, 100);
 

@@ -126,17 +126,22 @@ Terrain.prototype._toMesh = function(width, increments, wireframe) {
     vertex.z -= averageHeight;
   });
 
-  geometry.computeFaceNormals();
+  // geometry.computeFaceNormals();
   // geometry.computeFlatVertexNormals()
-  geometry.computeVertexNormals();
+  // geometry.computeVertexNormals();
 
   var material = new THREE.MeshPhongMaterial({
-    color: 0xFFFFFF,
-    wireframe: wireframe
+    color: 0xffffff,
+    wireframe: wireframe,
+    shading: THREE.FlatShading,
+    side: THREE.DoubleSide
   });
 
   var mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.x = -Math.PI / 2;
+
+  mesh.receiveShadow = true;
+  mesh.castShadow = true;
 
   return mesh;
 };
