@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+/* dat gui */
+.dg .cr.string,
+.dg .cr.number,
+.dg .cr.boolean,
+.dg .cr.function {
+  border-left: 3px solid #fff !important;
+}
+
+.dg .c .slider-fg {
+  background: #fff !important;
+}
+
+.dg .cr.number input[type=text] {
+  color: #fff !important;
+}
