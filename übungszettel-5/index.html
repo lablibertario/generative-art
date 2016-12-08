@@ -29,11 +29,12 @@
 			container: 'container',
 			stats: true,
 			datGui: true,
+			cameraPosition: new THREE.Vector3(100, 100, 100),
 			variables: [{
 				type: 'boolean',
 				variable: 'rotateCamera',
 				name: 'Rotate Camera',
-				initial: true
+				initial: false
 			}, {
 				type: 'number',
 				variable: 'detail',
@@ -89,7 +90,7 @@
 					'Shaded Mesh': 'toShadedMesh'
 				},
 				name: 'Mode',
-				initial: 'toPoints',
+				initial: 'toWireframeMesh',
 				onChange: function() {
 					this.updateTerrain();
 				}

@@ -18,9 +18,9 @@ function App(options) {
 	this.camera = new THREE.PerspectiveCamera(
 		this.fieldOfView, this.aspectRatio, this.nearPlane, this.farPlane);
 
-	this.camera.position.x = 0;
-	this.camera.position.z = 0;
-	this.camera.position.y = 0;
+	if (options.cameraPosition) {
+		this.camera.position.add(options.cameraPosition);
+	}
 
 	this.renderer = new THREE.WebGLRenderer({
 		alpha: true,
@@ -162,7 +162,7 @@ App.prototype.updateDatGui = function(variables) {
 
 			that[variable.variable] = undefined;
 
-			if (variable.initial) {
+			if (variable.initial !== undefined) {
 				that[variable.variable] = variable.initial;
 			}
 

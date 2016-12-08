@@ -41,8 +41,6 @@ ThreeApp.prototype.init = function () {
   this.orbitControls.enableDamping = true;
   this.orbitControls.dampingFactor = 0.5;
   this.orbitControls.enableZoom = true;
-
-  console.log(this.orbitControls);
 };
 
 ThreeApp.prototype.onTerrainGenerated = function(data) {
