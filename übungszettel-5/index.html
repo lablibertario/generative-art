@@ -17,6 +17,7 @@
 	<script src="vendor/stats.js"></script>
 	<script src="vendor/simplex-noise.min.js"></script>
 	<script src="vendor/orbit-controls.js"></script>
+	<script src="vendor/first-person-controls.js"></script>
 
 	<script src="js/util.js"></script>
 	<script src="js/terrain.js"></script>
@@ -30,6 +31,7 @@
 			stats: true,
 			datGui: true,
 			cameraPosition: new THREE.Vector3(100, 100, 100),
+			controls: 'orbit', // 'orbit' or 'first-person'
 			variables: [{
 				type: 'boolean',
 				variable: 'rotateCamera',
@@ -61,7 +63,7 @@
 				type: 'number',
 				variable: 'width',
 				min: 10,
-				max: 200,
+				max: 1000,
 				step: 10,
 				name: 'Width',
 				initial: 100,
@@ -90,7 +92,7 @@
 					'Shaded Mesh': 'toShadedMesh'
 				},
 				name: 'Mode',
-				initial: 'toWireframeMesh',
+				initial: 'toSpheres',
 				onChange: function() {
 					this.updateTerrain();
 				}

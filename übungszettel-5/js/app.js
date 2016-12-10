@@ -31,8 +31,7 @@ function App(options) {
 	this.renderer.setSize(this.width, this.height);
 
 	this.mouseDown = false;
-	this.mouseX = 0;
-	this.mouseY = 0;
+	this.mouse = new THREE.Vector2();
 
 	this.guiOptions = {};
 
@@ -80,7 +79,7 @@ function App(options) {
     this.updateDatGui(options.variables);
   }
 
-	this.init();
+	this.init(options);
 }
 
 App.prototype.init = function() {
@@ -98,8 +97,8 @@ App.prototype.onWindowResize = function() {
 };
 
 App.prototype.onMouseMove = function(e) {
-  this.mouseX = event.clientX - window.innerWidth / 2;
-  this.mouseY = event.clientY - window.innerHeight / 2;
+	this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;	
 };
 
 App.prototype.start = function() {
