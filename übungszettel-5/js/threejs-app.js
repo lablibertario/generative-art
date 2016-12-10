@@ -74,7 +74,7 @@ ThreeApp.prototype.onTerrainGenerated = function(data) {
 ThreeApp.prototype.update = function () {
   this.orbitControls.update();
 
-  // camera rotation
+  // automatic camera rotation
   var r = 100;
   var rotationSpeed = 0.5;
 
@@ -118,6 +118,13 @@ ThreeApp.prototype.update = function () {
   } else {
     this.threeDCursor.children[0].material.visible = false;
   }
+
+  // key frame marker animation
+  var offset = new THREE.Vector3(0, Math.sin(this.time / 10) * 0.05, 0);
+
+  this.keyFrameMarkers.forEach(function(marker) {
+    marker.position.add(offset);
+  });
 };
 
 ThreeApp.prototype.updateTerrain = function(mode) {
@@ -147,6 +154,7 @@ ThreeApp.prototype.generateTerrain = function(detail, sharpness) {
     });
   }
 
+  this.clearKeyFrameMarkers();
 };
 
 ThreeApp.prototype.hasKeyFrameMarker = function(position) {
@@ -155,7 +163,8 @@ ThreeApp.prototype.hasKeyFrameMarker = function(position) {
   var positionClone = position.clone();
 
   this.keyFrameMarkers.forEach(function(marker) {
-    if (marker.position.clone().sub(position).length() < 0.1) {
+    if (marker.position.x - position.x < 0.1
+        && marker.position.z - position.z < 0.1) {
       hasKeyFrameMarker = true;
     }
   });
@@ -179,5 +188,23 @@ ThreeApp.prototype.isKeyFrameMarker = function(object) {
 }
 
 ThreeApp.prototype.clearKeyFrameMarkers = function(position) {
+  if (!this.keyFrameMarkers) {
+    return;
+  }
 
+  this.keyFrameMarkers.forEach(function(marker) {
+    marker.parent.remove(marker);
+  });
+
+  this.keyFrameMarkers = [];
+};
+
+ThreeApp.prototype.setKeyFrameMarkersVisible = function(visible) {
+  if (!this.keyFrameMarkers) {
+    return;
+  }
+
+  if (this.keyFrameMarkers.length) {
+    this.keyFrameMarkers[0].material.visible = visible;
+  }
 }

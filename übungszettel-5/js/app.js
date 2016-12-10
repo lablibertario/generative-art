@@ -98,7 +98,7 @@ App.prototype.onWindowResize = function() {
 
 App.prototype.onMouseMove = function(e) {
 	this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;	
+	this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 };
 
 App.prototype.start = function() {
@@ -155,8 +155,26 @@ App.prototype.updateDatGui = function(variables) {
 
 	this.datGuiVariables = [];
 
+	// TODO support folders and functions
+
   if (variables) {
-    variables.forEach(function(variable) {
+		this._addVariablesToDatGui(variables);
+  }
+};
+
+App.prototype._addVariablesToDatGui = function(variables, folder) {
+	folder = folder || this.datGui;
+
+	var that = this;
+
+	variables.forEach(function(variable) {
+
+		if (variable.type === 'folder') {
+			var subFolder = folder.addFolder(variable.name);
+
+			that._addVariablesToDatGui(variable.variables, subFolder);
+		} else {
+
 			that.datGuiVariables.push(variable.variable);
 
 			that[variable.variable] = undefined;
@@ -165,31 +183,31 @@ App.prototype.updateDatGui = function(variables) {
 				that[variable.variable] = variable.initial;
 			}
 
-      var controller;
+			var controller;
 
-      switch (variable.type) {
-        case 'boolean':
-          controller = that.datGui.add(that, variable.variable).listen();
-          break;
-        case 'number':
-          controller = that.datGui.add(that, variable.variable, variable.min, variable.max).listen();
-          break;
-        case 'dropdown':
-					controller = that.datGui.add(that, variable.variable, variable.options).listen();
-          break;
-      }
+			switch (variable.type) {
+				case 'boolean':
+					controller = folder.add(that, variable.variable).listen();
+					break;
+				case 'number':
+					controller = folder.add(that, variable.variable, variable.min, variable.max).listen();
+					break;
+				case 'dropdown':
+					controller = folder.add(that, variable.variable, variable.options).listen();
+					break;
+			}
 
 			if (variable.step) {
 				controller.step(variable.step);
 			}
 
-      if (variable.name) {
-        controller.name(variable.name);
-      }
+			if (variable.name) {
+				controller.name(variable.name);
+			}
 
 			if (variable.onChange) {
 				controller.onChange(variable.onChange.bind(that));
 			}
-    });
-  }
+		}
+	});
 };
