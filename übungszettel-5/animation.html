@@ -1,0 +1,44 @@
+<html>
+  <head>
+
+  </head>
+  <body>
+    <script src="vendor/three.min.js"></script>
+
+    <script src="js/util.js"></script>
+  	<script src="js/tweening.js"></script>
+  	<script src="js/sorting.js"></script>
+  	<script src="js/animation.js"></script>
+
+    <script>
+      var animation = new Animation();
+
+      animation.setIsLooping(true);
+
+      animation.addKeyFrame({
+        time: 0,
+        data: [
+          { type: 'vector', data: new THREE.Vector3(0, 0, 0) },
+          { type: 'number', data: 0 }
+        ]
+      });
+
+      animation.addKeyFrame({
+        time: 10,
+        data: [
+          { type: 'vector', data: new THREE.Vector3(1, 1, 1) },
+          { type: 'number', data: 90 }
+        ]
+      });
+
+      for (var i = 0; i < 20; i++) {
+        console.log(
+          animation.getData(i, tweenLinear)[0].x + ', ' +
+          animation.getData(i, tweenLinear)[0].y + ', ' +
+          animation.getData(i, tweenLinear)[0].z + ', '
+        );
+      }
+
+    </script>
+  </body>
+</html>

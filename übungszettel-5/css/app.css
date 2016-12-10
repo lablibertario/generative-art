@@ -1,6 +1,32 @@
 body {
   margin: 0;
   overflow: hidden;
+  font-family: 'Droid Sans Mono', monospace;
+}
+
+#info {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 24px;
+  z-index: 99999;
+}
+
+#info-controls td {
+  padding-right: 48px;
+}
+
+a {
+  color: #fff;
+}
+
+a:hover {
+  color: #fff;
 }
 
 /* dat gui */
@@ -17,4 +43,12 @@ body {
 
 .dg .cr.number input[type=text] {
   color: #fff !important;
+}
+
+.dg .property-name,
+.dg li.title,
+.close-button,
+.c input,
+.c select {
+  font-family: 'Droid Sans Mono', monospace;
 }

@@ -154,8 +154,7 @@ App.prototype.updateDatGui = function(variables) {
 	}
 
 	this.datGuiVariables = [];
-
-	// TODO support folders and functions
+	this.datGuiAnonymousFunctions = {};
 
   if (variables) {
 		this._addVariablesToDatGui(variables);
@@ -169,15 +168,22 @@ App.prototype._addVariablesToDatGui = function(variables, folder) {
 
 	variables.forEach(function(variable) {
 
+		var anonymousFunctionName = undefined;
+
 		if (variable.type === 'folder') {
 			var subFolder = folder.addFolder(variable.name);
 
 			that._addVariablesToDatGui(variable.variables, subFolder);
 		} else {
 
-			that.datGuiVariables.push(variable.variable);
+			if (variable.variable) {
+				that.datGuiVariables.push(variable.variable);
+				that[variable.variable] = undefined;
+			} else if (variable.function && typeof variable.function === 'function') {
+				anonymousFunctionName = that.anonymousFunctionName();
 
-			that[variable.variable] = undefined;
+				that.datGuiAnonymousFunctions[anonymousFunctionName] = variable.function;
+			}
 
 			if (variable.initial !== undefined) {
 				that[variable.variable] = variable.initial;
@@ -195,6 +201,14 @@ App.prototype._addVariablesToDatGui = function(variables, folder) {
 				case 'dropdown':
 					controller = folder.add(that, variable.variable, variable.options).listen();
 					break;
+				case 'function':
+
+					if (typeof variable.function === 'function') {
+						controller = folder.add(that.datGuiAnonymousFunctions, anonymousFunctionName);
+					} else {
+						controller = folder.add(that, variable.function);
+					}
+					break;
 			}
 
 			if (variable.step) {
@@ -210,4 +224,8 @@ App.prototype._addVariablesToDatGui = function(variables, folder) {
 			}
 		}
 	});
+};
+
+App.prototype.anonymousFunctionName = function() {
+	return 'function_' + Math.random().toString(36).substr(2, 9);
 };

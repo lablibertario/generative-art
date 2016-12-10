@@ -11,6 +11,15 @@ ThreeApp.prototype.init = function(options) {
 
   var that = this;
 
+  // animation camera
+  this.editorCamera = this.camera;
+  this.animationCamera = new THREE.PerspectiveCamera(
+	   45, this.aspectRatio, this.nearPlane, this.farPlane);
+
+  this.currentCamera = this.editorCamera;
+
+  this.view = 'editor';
+
   this.clock = new THREE.Clock();
 
   this.renderer.shadowMapEnabled = true;
@@ -46,6 +55,10 @@ ThreeApp.prototype.init = function(options) {
   addObjectsTo(this.scene, this.keyFrameMarkerGroup);
 
   addObjectsTo(this.scene, this.threeDCursor);
+
+  this.animatedObject = this.animationCamera;
+
+  addObjectsTo(this.scene, this.animatedObject);
 
   // controls
   if (options.controls) {
@@ -92,7 +105,10 @@ ThreeApp.prototype.update = function () {
   var intersects = this.raycaster.intersectObjects(this.terrainGroup.children);
 
   if (intersects.length) {
-    this.threeDCursor.children[0].material.visible = true;
+
+    if (this.view === 'editor') {
+      this.threeDCursor.children[0].material.visible = true;
+    }
 
     var position;
 
@@ -114,6 +130,8 @@ ThreeApp.prototype.update = function () {
       addObjectsTo(this.keyFrameMarkerGroup, keyFrameMarker);
 
       this.keyFrameMarkers.push(keyFrameMarker);
+
+      this.updateAnimation();
     }
   } else {
     this.threeDCursor.children[0].material.visible = false;
@@ -125,6 +143,18 @@ ThreeApp.prototype.update = function () {
   this.keyFrameMarkers.forEach(function(marker) {
     marker.position.add(offset);
   });
+
+  // animation
+  if (this.animation) {
+    var data = this.animation.getData(this.time - this.currentAnimationStartTime, tweenEased);
+
+    var position = data[0];
+    var lookAtPosition = data[1];
+
+    this.animatedObject.position.set(position.x, position.y, position.z);
+
+    this.animatedObject.lookAt(lookAtPosition);
+  }
 };
 
 ThreeApp.prototype.updateTerrain = function(mode) {
@@ -155,6 +185,8 @@ ThreeApp.prototype.generateTerrain = function(detail, sharpness) {
   }
 
   this.clearKeyFrameMarkers();
+
+  this.stopAnimation();
 };
 
 ThreeApp.prototype.hasKeyFrameMarker = function(position) {
@@ -185,7 +217,7 @@ ThreeApp.prototype.isKeyFrameMarker = function(object) {
   });
 
   return isKeyFrameMarker;
-}
+};
 
 ThreeApp.prototype.clearKeyFrameMarkers = function(position) {
   if (!this.keyFrameMarkers) {
@@ -200,11 +232,126 @@ ThreeApp.prototype.clearKeyFrameMarkers = function(position) {
 };
 
 ThreeApp.prototype.setKeyFrameMarkersVisible = function(visible) {
-  if (!this.keyFrameMarkers) {
+  if (!this.keyFrameMarkers || !this.keyFrameMarkers.length) {
     return;
   }
 
   if (this.keyFrameMarkers.length) {
-    this.keyFrameMarkers[0].material.visible = visible;
+    this.keyFrameMarkers[0].children[0].material.visible = visible;
   }
+}
+
+ThreeApp.prototype.startAnimation = function() {
+
+  if (!this.keyFrameMarkers || !this.keyFrameMarkers.length) {
+    return;
+  }
+
+  this.animation = new Animation();
+
+  this.animation.setIsLooping(true);
+
+  this.updateAnimation();
+
+  this.currentAnimationStartTime = this.time;
+
+  this.setView('animation');
+};
+
+ThreeApp.prototype.stopAnimation = function() {
+  this.animation = undefined;
+
+  this.setView('editor');
+};
+
+ThreeApp.prototype.updateAnimation = function() {
+
+  if (!this.keyFrameMarkers.length || !this.animation) {
+    return;
+  }
+
+  this.animation.keyFrames = [];
+
+  var totalTime = 0;
+
+  for (var i = 0; i < this.keyFrameMarkers.length; i++) {
+    var time = 0;
+
+    if (i > 0) {
+      var sectionTime = 10 * this.keyFrameMarkers[i].position.clone().sub(this.keyFrameMarkers[i - 1].position).length()
+        / this.animationSpeed;
+
+      time = totalTime + sectionTime;
+
+      totalTime += sectionTime;
+    }
+
+    var position = this.keyFrameMarkers[i].position.clone().add(new THREE.Vector3(0, 16, 0));
+
+    var nextIndex;
+
+    if (i + 1 < this.keyFrameMarkers.length) {
+      nextIndex = i + 1;
+    } else {
+      nextIndex = 0;
+    }
+
+    var lookAtPosition = this.keyFrameMarkers[nextIndex].position.clone().add(new THREE.Vector3(0, 16, 0));
+
+    var keyFrame = {
+      time: time,
+      data: [
+        { type: 'vector', data: position },
+        { type: 'vector', data: lookAtPosition }
+      ]
+    };
+
+    this.animation.addKeyFrame(keyFrame);
+
+    // loop animation path
+    if (i === this.keyFrameMarkers.length - 1) {
+      time = totalTime + 10 * this.keyFrameMarkers[i].position.clone().sub(this.keyFrameMarkers[0].position).length()
+        / this.animationSpeed;
+
+      position = this.keyFrameMarkers[0].position.clone().add(new THREE.Vector3(0, 16, 0));
+      lookAtPosition = this.keyFrameMarkers[1].position.clone().add(new THREE.Vector3(0, 16, 0));
+
+      var loopKeyFrame = {
+        time: time,
+        data: [
+          { type: 'vector', data: position },
+          { type: 'vector', data: lookAtPosition }
+        ]
+      };
+
+      this.animation.addKeyFrame(loopKeyFrame);
+    }
+  }
+};
+
+ThreeApp.prototype.setView = function(view) {
+  this.view = view;
+
+  if (view === 'editor') {
+    this.setCamera(this.editorCamera);
+
+    if (this.threeDCursor) {
+      this.threeDCursor.children[0].material.visible = true;
+    }
+
+    this.setKeyFrameMarkersVisible(true);
+  } else {
+    this.setCamera(this.animationCamera);
+
+    if (this.threeDCursor) {
+      this.threeDCursor.children[0].material.visible = false;
+    }
+
+    this.setKeyFrameMarkersVisible(false);
+  }
+};
+
+ThreeApp.prototype.setCamera = function(camera) {
+  this.camera = camera;
+  this.currentCamera = camera;
 }

@@ -10,6 +10,11 @@ var pointsMaterial = new THREE.PointsMaterial({ size: 1, sizeAttenuation: false 
       color: 0xff0000,
   		opacity: 0.5,
   		transparent: true
+  	}),
+    animatedObjectMaterial = new THREE.MeshLambertMaterial({
+      color: 0x0000ff,
+  		opacity: 0.5,
+  		transparent: true
   	});
 
 function addObjectsTo(scene, objects) {
@@ -87,6 +92,20 @@ function createKeyFrameMarker(position, material) {
   parent.position.add(position);
 
   var cone = createCone(new THREE.Vector3(0, 8, 0), material || keyFrameMarkerMaterial);
+
+  parent.add(cone)
+
+  return parent;
+}
+
+function createAnimatedObject(position, material) {
+  var parent = new THREE.Object3D();
+
+  parent.position.add(position);
+
+  var cone = createCone(new THREE.Vector3(0, 8, 0), material || animatedObjectMaterial);
+
+  cone.rotation.x = Math.PI / 2;
 
   parent.add(cone)
 
