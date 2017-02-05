@@ -267,6 +267,20 @@ AFRAME.registerComponent('terrain', {
 
     var mesh = terrain.toShadedMesh(data.width, data.increments, data.color);
 
+    var raycaster = new THREE.Raycaster();
+    raycaster.set(new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 1, 0), 0, 1000);
+
+    var interations = 0,
+        maxIterations = 50;
+
+    while(raycaster.intersectObject(mesh).length && interations < maxIterations) {
+      terrain.generate(data.sharpness);
+
+      mesh = terrain.toShadedMesh(data.width, data.increments, data.color);
+
+      interations++;
+    }
+
     this.el.setObject3D('mesh', mesh);
   },
   tick: function () {},
